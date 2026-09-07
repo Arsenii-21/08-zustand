@@ -1,9 +1,12 @@
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 import type { Metadata } from "next";
-import Link from "next/link";
-import { fetchNoteById } from "../../../lib/api/notes";
-import { formatDate } from "../../../lib/formatDate";
+import { fetchNoteById } from "../../../lib/api";
 import { openGraphImage, siteUrl } from "../../../lib/seo";
-import css from "./page.module.css";
+import NoteDetails from "./NoteDetails.client";
 
 export const dynamic = "force-dynamic";
 interface NotePageProps {
@@ -29,16 +32,16 @@ export async function generateMetadata({
 }
 
 export default async function NotePage({ params }: NotePageProps) {
-  const note = await fetchNoteById((await params).id);
+  const { id } = await params;
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: ["note", id],
+    queryFn: () => fetchNoteById(id),
+  });
+
   return (
-    <main className={css.main}>
-      <article className={css.article}>
-        <Link href="/notes/filter/all">← All notes</Link>
-        <span>{note.tag}</span>
-        <h1>{note.title}</h1>
-        <p>{note.content}</p>
-        <time dateTime={note.createdAt}>{formatDate(note.createdAt)}</time>
-      </article>
-    </main>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <NoteDetails />
+    </HydrationBoundary>
   );
 }

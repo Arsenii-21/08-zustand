@@ -1,7 +1,12 @@
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
 import type { Metadata } from "next";
-import NotesClient from "../../../../components/NotesClient/NotesClient";
-import { fetchNotes } from "../../../../lib/api/notes";
+import { fetchNotes } from "../../../../lib/api";
 import { openGraphImage, siteUrl } from "../../../../lib/seo";
+import NotesClient from "./Notes.client";
 
 export const dynamic = "force-dynamic";
 interface FilterPageProps {
@@ -28,6 +33,15 @@ export async function generateMetadata({
 
 export default async function FilterPage({ params }: FilterPageProps) {
   const tag = (await params).slug.join("/") || "all";
-  const data = await fetchNotes("", tag);
-  return <NotesClient tag={tag} initialNotes={data.notes} />;
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: ["notes", tag],
+    queryFn: () => fetchNotes("", tag),
+  });
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <NotesClient tag={tag} />
+    </HydrationBoundary>
+  );
 }

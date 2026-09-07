@@ -1,17 +1,14 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { fetchNoteById } from "../../lib/api/notes";
-import { formatDate } from "../../lib/formatDate";
-import Modal from "../Modal/Modal";
+import { useParams, useRouter } from "next/navigation";
+import { fetchNoteById } from "../../../../lib/api";
+import { formatDate } from "../../../../lib/formatDate";
+import Modal from "../../../../components/Modal/Modal";
 import css from "./NotePreview.module.css";
 
-interface NotePreviewProps {
-  id: string;
-}
-
-export default function NotePreview({ id }: NotePreviewProps) {
+export default function NotePreview() {
+  const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const {
     data: note,
@@ -20,6 +17,7 @@ export default function NotePreview({ id }: NotePreviewProps) {
   } = useQuery({
     queryKey: ["note", id],
     queryFn: () => fetchNoteById(id),
+    refetchOnMount: false,
   });
 
   return (

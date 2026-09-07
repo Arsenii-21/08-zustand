@@ -1,5 +1,15 @@
-import type { NewNote, Note, NotesResponse, NoteTag } from "../../types/note";
-import { api } from "./client";
+import axios from "axios";
+import type { NewNote, Note, NotesResponse, NoteTag } from "../types/note";
+
+const api = axios.create({
+  baseURL: "https://notehub-public.goit.study/api",
+  headers: {
+    "Content-Type": "application/json",
+    ...(process.env.NEXT_PUBLIC_API_TOKEN
+      ? { Authorization: `Bearer ${process.env.NEXT_PUBLIC_API_TOKEN}` }
+      : {}),
+  },
+});
 
 export async function fetchNotes(
   search = "",
@@ -7,7 +17,12 @@ export async function fetchNotes(
   page = 1,
 ): Promise<NotesResponse> {
   const { data } = await api.get<NotesResponse>("/notes", {
-    params: { search, tag: tag === "all" ? undefined : tag, page, perPage: 12 },
+    params: {
+      search,
+      tag: tag === "all" ? undefined : tag,
+      page,
+      perPage: 12,
+    },
   });
   return data;
 }

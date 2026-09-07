@@ -1,4 +1,10 @@
-import NotePreview from "../../../../components/NotePreview/NotePreview";
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import { fetchNoteById } from "../../../../lib/api";
+import NotePreview from "./NotePreview.client";
 
 interface InterceptedNotePageProps {
   params: Promise<{ id: string }>;
@@ -8,5 +14,15 @@ export default async function InterceptedNotePage({
   params,
 }: InterceptedNotePageProps) {
   const { id } = await params;
-  return <NotePreview id={id} />;
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: ["note", id],
+    queryFn: () => fetchNoteById(id),
+  });
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <NotePreview />
+    </HydrationBoundary>
+  );
 }
