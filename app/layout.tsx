@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import type { ReactNode } from "react";
+import TanStackProvider from "../components/TanStackProvider/TanStackProvider";
 import "./globals.css";
 import { openGraphImage, siteUrl } from "../lib/seo";
-import Providers from "./providers";
 
 const roboto = Roboto({
   weight: ["400", "500", "700"],
@@ -30,10 +30,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={roboto.variable}>
       <body>
-        <Providers>
+        <TanStackProvider>
           {children}
           {modal}
-        </Providers>
+        </TanStackProvider>
       </body>
     </html>
   );
