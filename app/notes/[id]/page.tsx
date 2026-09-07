@@ -16,7 +16,8 @@ interface NotePageProps {
 export async function generateMetadata({
   params,
 }: NotePageProps): Promise<Metadata> {
-  const note = await fetchNoteById((await params).id);
+  const { id } = await params;
+  const note = await fetchNoteById(id);
   const title = `${note.title} | NoteHub`;
   const description = note.content.slice(0, 160);
   return {
@@ -25,7 +26,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      url: siteUrl,
+      url: `${siteUrl}notes/${id}`,
       images: [openGraphImage],
     },
   };

@@ -35,8 +35,8 @@ export default async function FilterPage({ params }: FilterPageProps) {
   const tag = (await params).slug.join("/") || "all";
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({
-    queryKey: ["notes", tag],
-    queryFn: () => fetchNotes("", tag),
+    queryKey: ["notes", tag, "", 1],
+    queryFn: () => fetchNotes("", tag, 1),
   });
 
   return (

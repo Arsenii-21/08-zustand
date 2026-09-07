@@ -1,7 +1,11 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import { useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
+import Pagination from "../../../../components/Pagination/Pagination";
+import SearchBox from "../../../../components/SearchBox/SearchBox";
 import { fetchNotes } from "../../../../lib/api";
 import { formatDate } from "../../../../lib/formatDate";
 import css from "./Notes.module.css";
@@ -11,18 +15,28 @@ interface NotesClientProps {
 }
 
 export default function NotesClient({ tag }: NotesClientProps) {
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
+
+  const handleSearchChange = useDebouncedCallback((value: string) => {
+    setSearch(value);
+    setPage(1);
+  }, 300);
+
   const { data, isError, isLoading } = useQuery({
-    queryKey: ["notes", tag],
-    queryFn: () => fetchNotes("", tag),
-    refetchOnMount: false,
+    queryKey: ["notes", tag, search, page],
+    queryFn: () => fetchNotes(search, tag, page),
+    placeholderData: keepPreviousData,
   });
 
   const notes = data?.notes ?? [];
+  const totalPages = data?.totalPages ?? 1;
 
   return (
     <div className={css.app}>
       <div className={css.toolbar}>
         <p className={css.filter}>Filter: {tag}</p>
+        <SearchBox value={search} onChange={handleSearchChange} />
         <Link className={css.button} href="/notes/action/create">
           Create note +
         </Link>
@@ -46,6 +60,13 @@ export default function NotesClient({ tag }: NotesClientProps) {
           </li>
         ))}
       </ul>
+      {totalPages > 1 && (
+        <Pagination
+          pageCount={totalPages}
+          currentPage={page}
+          onPageChange={setPage}
+        />
+      )}
     </div>
   );
 }
