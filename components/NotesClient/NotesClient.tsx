@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { fetchNotes } from "../../lib/api/notes";
+import { formatDate } from "../../lib/formatDate";
 import type { Note } from "../../types/note";
 import css from "./NotesClient.module.css";
 
@@ -44,7 +45,7 @@ export default function NotesClient({ tag, initialNotes }: NotesClientProps) {
                 <h2>{note.title}</h2>
                 <p>{note.content}</p>
                 <time dateTime={note.createdAt}>
-                  {new Date(note.createdAt).toLocaleDateString()}
+                  {formatDate(note.createdAt)}
                 </time>
               </Link>
             </li>

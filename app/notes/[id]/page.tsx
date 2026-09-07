@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { fetchNoteById } from "../../../lib/api/notes";
+import { formatDate } from "../../../lib/formatDate";
 import { openGraphImage, siteUrl } from "../../../lib/seo";
 import css from "./page.module.css";
 
@@ -36,9 +37,7 @@ export default async function NotePage({ params }: NotePageProps) {
         <span>{note.tag}</span>
         <h1>{note.title}</h1>
         <p>{note.content}</p>
-        <time dateTime={note.createdAt}>
-          {new Date(note.createdAt).toLocaleDateString()}
-        </time>
+        <time dateTime={note.createdAt}>{formatDate(note.createdAt)}</time>
       </article>
     </main>
   );
