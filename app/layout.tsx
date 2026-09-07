@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
+import type { ReactNode } from "react";
 import "./globals.css";
 import { openGraphImage, siteUrl } from "../lib/seo";
 import Providers from "./providers";
@@ -22,11 +23,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+  modal,
+}: LayoutProps<"/"> & { modal: ReactNode }) {
   return (
     <html lang="en" className={roboto.variable}>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          {modal}
+        </Providers>
       </body>
     </html>
   );
